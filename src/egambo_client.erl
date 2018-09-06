@@ -20,7 +20,7 @@ disconnect() -> gen_server:call(?MODULE, die).
 
 send(Json) when is_map(Json) ->
 	JsonBin = jsx:encode(Json),
-	?L("TX: ~s", [jsx:pretty(JsonBin)]),
+	?L("TX: ~s", [jsx:prettify(JsonBin)]),
 	gen_server:call(?MODULE, {send, JsonBin}).
 
 init(SslSocket) ->
@@ -37,11 +37,11 @@ handle_call({send, JsonBin}, _From, SslSocket) ->
 	 SslSocket}.
 	
 handle_info({ssl, SslSocket, JsonBin}, SslSocket) ->
-	case catch jsx:pretty(JsonBin) of
-		{'EXIT', Reason} ->
-			?L("RX ERROR : ~p~n~p", [Reason, JsonBin]);
-		JsonPretty ->
-			?L("RX : ~p", [JsonPretty])
+	try
+		?L("RX : ~p", [jsx:decode(JsonBin, [return_maps])]),
+		?L("~s", [jsx:prettify(JsonBin)])
+	catch _:Exception ->
+		?L("RX ERROR : ~p~n~p", [Exception, JsonBin])
 	end,
 	{noreply, SslSocket};
 handle_info({ssl_closed, SslSocket}, SslSocket) -> {stop, normal, SslSocket};
