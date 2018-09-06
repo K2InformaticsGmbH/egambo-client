@@ -18,4 +18,4 @@ echo "Starting egambo_client"
 echo "------------------------------------------"
 
 # Starting dderl
-$exename
+$exename $paths

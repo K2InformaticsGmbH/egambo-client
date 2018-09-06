@@ -10,6 +10,7 @@
 ).
 
 connect(Ip, Port) ->
+	application:ensure_all_started(ssl),
 	{ok, SslSocket} = ssl:connect(Ip, Port, [{active, false}, {packet, 4},
 	                                         {mode, binary}]),
 	{ok, Pid} = gen_server:start_link({local, ?MODULE}, ?MODULE, SslSocket, []),
